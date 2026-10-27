@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor Tareas</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="./js/tareasjs.js" defer></script>
+</head>
+<body>
+    <h1>Gestor de tareas</h1>
+
+    <input type="text" id="buscador" placeholder="Buscar por nombre o responsable...">
+
+    <select id="filtroPrioridad">
+        <option value="">Todas las prioridades</option>
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+    </select>
+
+    <select id="filtroEstado">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="terminada">Terminada</option>
+    </select>
+
+    <input type="number" id="filtroHoras" min="0" placeholder="Horas mínimas">
+
+    <button id="btnTexto">Ordenar por nombre (A-Z)</button>
+    <button id="btnNumero">Ordenar por id (1-9)</button>
+    <button id="btnHoras">Ordenar por horas</button>
+
+    <p id="resumen"></p>
+    <div id="contenedor"></div>
+</body>
+</html>
