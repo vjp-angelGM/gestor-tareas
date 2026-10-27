@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Tareas</title>
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
     <h1>Gestor de tareas</h1>
+
+    <input type="text" id="buscador" placeholder="Buscar por nombre o responsable...">
+    <button id="btnTexto">Ordenar por nombre (A-Z)</button>
+    <button id="btnNumero">Ordenar por id (1-9)</button>
+
+    <p id="resumen"></p>
+    <div id="contenedor"></div>
+
+    <script src="tareasjs.js" defer></script>
 </body>
-<script src="tareas.js"></script>
 </html>
