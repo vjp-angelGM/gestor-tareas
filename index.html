@@ -1,17 +1,28 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Gestor Tareas</title>
+
     <link rel="stylesheet" href="css/estilos.css">
-    <script src="./js/tareasjs.js" defer></script>
+    <script src="./js/tareas.js" defer></script>
 </head>
+
 <body>
+
     <h1>Gestor de tareas</h1>
 
-    <input type="text" id="buscador" placeholder="Buscar por nombre o responsable...">
+    <!-- BUSCADOR -->
+    <input
+        type="text"
+        id="buscador"
+        placeholder="Buscar por nombre o responsable..."
+    >
 
+    <!-- FILTROS -->
     <select id="filtroPrioridad">
         <option value="">Todas las prioridades</option>
         <option value="alta">Alta</option>
@@ -25,13 +36,35 @@
         <option value="terminada">Terminada</option>
     </select>
 
-    <input type="number" id="filtroHoras" min="0" placeholder="Horas mínimas">
+    <input
+        type="number"
+        id="filtroHoras"
+        min="0"
+        placeholder="Horas mínimas"
+    >
 
-    <button id="btnTexto">Ordenar por nombre (A-Z)</button>
-    <button id="btnNumero">Ordenar por id (1-9)</button>
-    <button id="btnHoras">Ordenar por horas</button>
+    <!-- ORDENACIÓN -->
+    <div class="controles">
 
+        <button id="ordenNombre">
+            Ordenar por nombre (A-Z)
+        </button>
+
+        <button id="ordenTiempo">
+            Ordenar por tiempo
+        </button>
+
+        <button id="ordenFecha">
+            Más recientes primero
+        </button>
+
+    </div>
+
+    <!-- RESUMEN -->
     <p id="resumen"></p>
+
+    <!-- TARJETAS -->
     <div id="contenedor"></div>
+
 </body>
 </html>

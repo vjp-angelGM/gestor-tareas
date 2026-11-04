@@ -1,26 +1,32 @@
+
 /* ---------- Variables de color ---------- */
 :root {
-  --fondo: #eef1f6;
-  --panel: #ffffff;
-  --texto: #1b1f2a;
-  --texto-suave: #5b6475;
-  --borde: #dcdfe4;
+  --fondo: #e8e4da;
+  --panel: #fffdf5;
+  --texto: #252525;
+  --texto-suave: #686868;
+  --borde: #d5d0c4;
   --acento: #3b5bdb;
   --acento-oscuro: #2f4ac0;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background: var(--fondo);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(#c8c3b7 0.7px, transparent 0.7px);
+  background-size: 12px 12px;
+  background-color: var(--fondo);
   color: var(--texto);
   max-width: 880px;
   margin: 24px auto;
   padding: 24px;
   border: 1px solid var(--borde);
   border-radius: 12px;
-  box-shadow: 0 4px 20px #0000000f;
+  box-shadow: 0 5px 25px #00000012;
 }
 
 h1 {
@@ -30,7 +36,8 @@ h1 {
   letter-spacing: 0.3px;
 }
 
-/* ---------- Controles: buscador, filtros y botones ---------- */
+/* ---------- Controles ---------- */
+
 input,
 select,
 button {
@@ -39,7 +46,7 @@ button {
   padding: 8px 12px;
   margin: 0 6px 10px 0;
   border: 1px solid var(--borde);
-  border-radius: 6px;
+  border-radius: 5px;
   background: var(--panel);
   color: var(--texto);
 }
@@ -63,94 +70,240 @@ select:focus {
 button {
   background: var(--acento);
   border-color: var(--acento);
-  color: #fff;
+  color: white;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
-button:hover { background: var(--acento-oscuro); }
-button:active { transform: scale(0.97); }
+button:hover {
+  background: var(--acento-oscuro);
+}
 
-/* Líneas de resumen bajo el título */
+button:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Resumen ---------- */
+
 #resumen,
 #info {
   font-size: 13px;
   margin: 0 0 14px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--panel);
   border-left: 4px solid var(--acento);
-  border-radius: 4px;
+  border-radius: 3px;
   color: var(--texto-suave);
+  box-shadow: 2px 3px 7px #0000000c;
 }
 
-/* Rejilla de tarjetas: 4 por fila, y se adapta si la pantalla es más estrecha */
+/* ---------- Rejilla de tarjetas ---------- */
+
 #contenedor {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 12px;
+  gap: 18px;
+  padding: 8px 3px 14px;
 }
 
-/* Tarjeta */
+/* ---------- Estilo de hojas de cuaderno ---------- */
+
 .tarjeta {
-  background: #997676;
-  color: #fff;
-  border: 2px solid transparent; /* reserva el hueco para que el hover no mueva nada */
-  border-radius: 8px;
-  padding: 14px 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  --papel: #fffdf5;
+  --linea: #00000012;
+  --margen: #e58b8b;
+  --tinta: #303030;
+
+  position: relative;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 29px,
+      var(--margen) 29px,
+      var(--margen) 30px,
+      transparent 30px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--papel) 0px,
+      var(--papel) 23px,
+      var(--linea) 24px,
+      var(--papel) 25px
+    );
+
+  color: var(--tinta);
+  border: 1px solid #00000020;
+  border-radius: 3px;
+  padding: 18px 12px 16px 40px;
+  min-height: 145px;
+
+  box-shadow:
+    2px 4px 7px #00000020,
+    0 1px 2px #00000010;
+
+  transform: rotate(-0.5deg);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
+/* Efecto de hoja ligeramente inclinada */
+
+.tarjeta:nth-child(even) {
+  transform: rotate(0.6deg);
+}
+
+.tarjeta:hover {
+  transform: translateY(-7px) rotate(0deg);
+  box-shadow: 4px 10px 18px #00000030;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* ---------- Perforaciones del cuaderno ---------- */
+
+.tarjeta::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+
+  background: #e8e4da;
+
+  box-shadow:
+    0 32px 0 #e8e4da,
+    0 64px 0 #e8e4da,
+    inset 0 1px 2px #00000030;
+}
+
+/* ---------- Contenido de las hojas ---------- */
 
 .tarjeta h3 {
-  margin: 0 0 8px;
+  margin: 0 0 9px;
+  font-family: "Segoe UI", sans-serif;
   font-size: 16px;
+  font-weight: 700;
   text-transform: capitalize;
+  line-height: 24px;
 }
 
 .tarjeta p {
   margin: 0;
   font-size: 12.5px;
-  line-height: 1.5;
+  line-height: 24px;
   opacity: 0.95;
 }
 
-.tarjeta:hover{
-  transform: translateY(-10px);
-  box-shadow: 0 8px 18px #00000040;
-  cursor: pointer;
-  border-color: limegreen;
+/* ---------- Colores por categoría ---------- */
+
+/* JavaScript: amarillo */
+
+.tarjeta-javascript {
+  --papel: #fff2b8;
+  --linea: #d6b94c35;
+  --margen: #d9a600;
+  --tinta: #584500;
 }
 
-/* ---------- Color por categoría (la clase la pone crearTarjeta en el JS) ---------- */
-.tarjeta-javascript     { background: #c79a00; }
-.tarjeta-html           { background: #d4562a; }
-.tarjeta-php            { background: #6a5acd; }
-.tarjeta-web            { background: #2b8a9e; }
-.tarjeta-ciberseguridad { background: #b02a37; }
-.tarjeta-base-de-datos  { background: #2f7d4f; }
-.tarjeta-monitorizacion { background: #4a5568; }
+/* HTML: naranja */
 
-/* Tareas del último mes (clase "reciente" que pone el JS) */
+.tarjeta-html {
+  --papel: #ffdfca;
+  --linea: #d4562a30;
+  --margen: #d4562a;
+  --tinta: #753014;
+}
+
+/* PHP: violeta */
+
+.tarjeta-php {
+  --papel: #e7ddff;
+  --linea: #6a5acd30;
+  --margen: #6a5acd;
+  --tinta: #40327c;
+}
+
+/* Web: azul turquesa */
+
+.tarjeta-web {
+  --papel: #d3f1f2;
+  --linea: #2b8a9e35;
+  --margen: #2b8a9e;
+  --tinta: #175763;
+}
+
+/* Ciberseguridad: rojo */
+
+.tarjeta-ciberseguridad {
+  --papel: #f8d9dc;
+  --linea: #b02a3730;
+  --margen: #b02a37;
+  --tinta: #75202a;
+}
+
+/* Base de datos: verde */
+
+.tarjeta-base-de-datos {
+  --papel: #d9f0df;
+  --linea: #2f7d4f30;
+  --margen: #2f7d4f;
+  --tinta: #205b37;
+}
+
+/* Monitorización: gris */
+
+.tarjeta-monitorizacion {
+  --papel: #e0e4eb;
+  --linea: #4a556830;
+  --margen: #4a5568;
+  --tinta: #303947;
+}
+
+/* ---------- Tareas recientes ---------- */
+
 .reciente {
-  border-color: #ffd43b;
-  box-shadow: 0 0 0 3px #ffd43b88;
+  border: 2px solid #e6b800;
+
+  box-shadow:
+    0 0 0 2px #ffd43b55,
+    2px 5px 9px #00000020;
 }
 
 .reciente h3::after {
   content: " ★";
-  color: #ffd43b;
+  color: #d99b00;
 }
 
 /* ---------- Formulario para añadir tareas ---------- */
+
 #formTarea {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px 12px;
   align-items: end;
-  background: var(--panel);
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fffdf5 0px,
+      #fffdf5 29px,
+      #dce5f0 30px,
+      #fffdf5 31px
+    );
+
   border: 1px solid var(--borde);
-  border-radius: 8px;
+  border-radius: 5px;
   padding: 14px;
   margin: 6px 0 16px;
+
+  box-shadow: 2px 4px 9px #00000012;
 }
 
 #formTarea h2 {
@@ -177,7 +330,8 @@ button:active { transform: scale(0.97); }
   margin: 0;
 }
 
-/* Avisos del formulario */
+/* ---------- Avisos del formulario ---------- */
+
 .aviso {
   grid-column: 1 / -1;
   margin: 0;
@@ -186,7 +340,9 @@ button:active { transform: scale(0.97); }
   border-radius: 6px;
 }
 
-.aviso:empty { display: none; }
+.aviso:empty {
+  display: none;
+}
 
 .aviso-error {
   color: #842029;
@@ -200,7 +356,8 @@ button:active { transform: scale(0.97); }
   border: 1px solid #a3d9b8;
 }
 
-/* Mensaje cuando no hay resultados */
+/* ---------- Sin resultados ---------- */
+
 .sin-resultados {
   grid-column: 1 / -1;
   text-align: center;
@@ -211,7 +368,8 @@ button:active { transform: scale(0.97); }
   border-radius: 8px;
 }
 
-/* Pantallas pequeñas */
+/* ---------- Pantallas pequeñas ---------- */
+
 @media (max-width: 600px) {
   body {
     margin: 0;
@@ -219,12 +377,30 @@ button:active { transform: scale(0.97); }
     border-radius: 0;
   }
 
-  h1 { font-size: 22px; }
+  h1 {
+    font-size: 22px;
+  }
 
   select,
   #filtroHoras,
   button {
     width: 100%;
     margin-right: 0;
+  }
+
+  #contenedor {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjeta {
+    transform: none;
+  }
+
+  .tarjeta:nth-child(even) {
+    transform: none;
+  }
+
+  .tarjeta:hover {
+    transform: translateY(-4px);
   }
 }
