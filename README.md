@@ -11,3 +11,4 @@ Aplicación de gestión de tareas desarrollada en JavaScript. Permite registrar,
 - Modificación del css añadiéndole color y solucionando fallos del hover de las tarjetas
 - Añadir expresión regular para fecha, referencia 
 - Añadido de cookie de sesión
+- Añadido del formulario para poder añadir tareas nuevas
