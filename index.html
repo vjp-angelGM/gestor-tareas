@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,6 +13,65 @@
 <body>
 
     <h1>Gestor de tareas</h1>
+
+    <!-- FORMULARIO PARA AÑADIR TAREAS (la referencia se valida con expresión regular) -->
+    <form id="formTarea" novalidate>
+        <h2>Añadir tarea</h2>
+
+        <label>
+            Referencia (ej: TAR-001)
+            <input type="text" id="referencia" name="referencia" placeholder="TAR-001">
+        </label>
+
+        <label>
+            Nombre
+            <input type="text" id="nombreTarea" name="nombre" placeholder="Ej: revisar logs">
+        </label>
+
+        <label>
+            Responsable
+            <input type="text" id="responsable" name="responsable" placeholder="Ej: Angel">
+        </label>
+
+        <label>
+            Categoría
+            <select id="categoria" name="categoria">
+                <option value="javascript">JavaScript</option>
+                <option value="html">HTML</option>
+                <option value="php">PHP</option>
+                <option value="web">Web</option>
+                <option value="ciberseguridad">Ciberseguridad</option>
+                <option value="base de datos">Base de datos</option>
+                <option value="monitorizacion">Monitorización</option>
+            </select>
+        </label>
+
+        <label>
+            Fecha
+            <input type="date" id="fecha" name="fecha">
+        </label>
+
+        <label>
+            Prioridad
+            <select id="prioridad" name="prioridad">
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+            </select>
+        </label>
+
+        <label>
+            Estado
+            <select id="estado" name="estado">
+                <option value="pendiente">Pendiente</option>
+                <option value="terminada">Terminada</option>
+            </select>
+        </label>
+
+        <button type="submit">Añadir</button>
+
+        <p id="aviso" class="aviso"></p>
+    </form>
 
     <!-- BUSCADOR -->
     <input

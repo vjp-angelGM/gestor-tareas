@@ -1,4 +1,3 @@
-
 // ====================================================
 // 1. VARIABLES Y CONSTANTES
 // ====================================================
@@ -374,8 +373,11 @@ function crearTarjeta(tarea) {
 
     const detalle = document.createElement("p");
 
+    // Si la tarea tiene referencia (viene del formulario), se muestra delante
+    const prefijoRef = tarea.referencia ? `Ref: ${tarea.referencia} | ` : "";
+
     detalle.textContent =
-        `Responsable: ${tarea.responsable} | Prioridad: ${tarea.prioridad} | ` +
+        `${prefijoRef}Responsable: ${tarea.responsable} | Prioridad: ${tarea.prioridad} | ` +
         `Estado: ${tarea.estado}`;
 
     // ------------------------------------------------
@@ -401,8 +403,8 @@ function crearTarjeta(tarea) {
 }
 
 
-/// ====================================================
-// PINTAR TARJETAS
+// ====================================================
+// 10. PINTAR TARJETAS
 // ====================================================
 
 function pintar(coleccion) {
@@ -533,49 +535,91 @@ function elegirOrden(nuevo) {
     actualizar();
 }
 
+
 // ====================================================
-// 12. INICIALIZACIÓN DE LA APLICACIÓN
+// 12. FORMULARIO PARA AÑADIR TAREAS
+//     Campo validado con expresión regular: la referencia
+//     (REGEX_REFERENCIA, ejemplo: TAR-001).
+//     Si no cumple el patrón se muestra un aviso y NO se añade.
 // ====================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+// Muestra un aviso debajo del formulario (tipo: "ok" o "error")
+function mostrarAviso(texto, tipo) {
 
-    // Botón ordenar por nombre
-    document.querySelector("#ordenNombre")
-        ?.addEventListener("click", () => elegirOrden("nombre"));
+    const aviso = document.querySelector("#aviso");
 
-    // Botón ordenar por tiempo
-    document.querySelector("#ordenTiempo")
-        ?.addEventListener("click", () => elegirOrden("tiempo"));
+    if (!aviso) {
+        return;
+    }
 
-    // Botón ordenar por fecha (más recientes primero)
-    document.querySelector("#ordenFecha")
-        ?.addEventListener("click", () => elegirOrden("fecha"));
-
-
-    // Listar tareas en consola
-    listar();
-
-    // Buscar tareas
-    buscarPorTexto("Luis");
+    aviso.textContent = texto;
+    aviso.className = "aviso " + (tipo === "ok" ? "aviso-ok" : "aviso-error");
+}
 
 
-    // Recuperar el criterio guardado en la cookie
-    const ordenGuardado = leerCookie("orden");
-
-    criterio = ["nombre", "tiempo", "fecha"].includes(ordenGuardado)
-        ? ordenGuardado
-        : "ninguno";
+// Siguiente id libre (el mayor existente + 1)
+function siguienteId() {
+    return tareas.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+}
 
 
-    // Pintar las tarjetas al iniciar
+function manejarFormulario(evento) {
+
+    evento.preventDefault();
+
+    const form = evento.target;
+
+    const referencia = form.elements.referencia.value.trim();
+    const nombre = form.elements.nombre.value.trim();
+    const responsable = form.elements.responsable.value.trim();
+    const fecha = form.elements.fecha.value;
+
+    // 1) Validación con expresión regular: referencia
+    if (!REGEX_REFERENCIA.test(referencia)) {
+        mostrarAviso(
+            "La referencia no es válida. Formato: 3 letras mayúsculas, un guion y 3 números (ejemplo: TAR-001).",
+            "error"
+        );
+        return;
+    }
+
+    // 2) La referencia no puede repetirse
+    if (tareas.some(t => t.referencia === referencia)) {
+        mostrarAviso(`La referencia ${referencia} ya existe.`, "error");
+        return;
+    }
+
+    // 3) Campos obligatorios
+    if (nombre === "" || responsable === "" || fecha === "") {
+        mostrarAviso("Rellena el nombre, el responsable y la fecha.", "error");
+        return;
+    }
+
+    const nueva = {
+        id: siguienteId(),
+        referencia: referencia,
+        nombre: nombre,
+        categoria: form.elements.categoria.value,
+        fecha: fecha, // el input type="date" ya da AAAA-MM-DD
+        prioridad: form.elements.prioridad.value,
+        estado: form.elements.estado.value,
+        responsable: responsable
+    };
+
+    // anadirTarea hace sus propias validaciones (id, fecha...)
+    if (!anadirTarea(nueva)) {
+        mostrarAviso("No se pudo añadir la tarea (revisa la consola).", "error");
+        return;
+    }
+
+    mostrarAviso(`Tarea ${referencia} añadida correctamente.`, "ok");
+    form.reset();
     actualizar();
+}
 
 
-    console.log("Aplicación inicializada correctamente.");
-
-});
 // ====================================================
-// 12. INICIALIZACIÓN DE LA APLICACIÓN
+// 13. INICIALIZACIÓN DE LA APLICACIÓN
 // ====================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -592,6 +636,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector("#ordenFecha")
         ?.addEventListener("click", () => elegirOrden("fecha"));
+
+
+    // -----------------------------------------------
+    // FORMULARIO
+    // -----------------------------------------------
+
+    document.querySelector("#formTarea")
+        ?.addEventListener("submit", manejarFormulario);
 
 
     // -----------------------------------------------
