@@ -12,3 +12,6 @@ Aplicación de gestión de tareas desarrollada en JavaScript. Permite registrar,
 - Añadir expresión regular para fecha, referencia 
 - Añadido de cookie de sesión
 - Añadido del formulario para poder añadir tareas nuevas
+
+## Sprint 2
+- Creación de los archivos *datos.js*, *logica.js*, *interfaz.js* y mover cada parte del script a cada uno de los ficheros.

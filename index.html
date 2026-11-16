@@ -7,7 +7,15 @@
     <title>Gestor Tareas</title>
 
     <link rel="stylesheet" href="css/estilos.css">
-    <script src="./js/tareas.js" defer></script>
+
+    <!-- Necesario para que el atributo hidden oculte las tarjetas aunque usen flex/grid -->
+    <style>
+        .tarjeta[hidden] {
+            display: none;
+        }
+    </style>
+
+    <script type="module" src="js/interfaz.js"></script>
 </head>
 
 <body>
@@ -73,10 +81,10 @@
         <p id="aviso" class="aviso"></p>
     </form>
 
-    <!-- BUSCADOR -->
+    <!-- BUSCADOR (el script lo busca por el id "filtro") -->
     <input
         type="text"
-        id="buscador"
+        id="filtro"
         placeholder="Buscar por nombre o responsable..."
     >
 
@@ -93,13 +101,6 @@
         <option value="pendiente">Pendiente</option>
         <option value="terminada">Terminada</option>
     </select>
-
-    <input
-        type="number"
-        id="filtroHoras"
-        min="0"
-        placeholder="Horas mínimas"
-    >
 
     <!-- ORDENACIÓN -->
     <div class="controles">
@@ -118,8 +119,12 @@
 
     </div>
 
-    <!-- RESUMEN -->
+    <!-- MENSAJE CUANDO NO HAY RESULTADOS -->
+    <p id="mensaje" hidden>No se encontraron tareas.</p>
+
+    <!-- RESUMEN Y ESTADÍSTICAS -->
     <p id="resumen"></p>
+    <p id="estadisticas"></p>
 
     <!-- TARJETAS -->
     <div id="contenedor"></div>

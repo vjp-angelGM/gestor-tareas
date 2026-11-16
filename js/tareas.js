@@ -67,7 +67,7 @@ function anadirTarea(tarea) {
     // Validamos que la fecha tenga formato AAAA-MM-DD
     if (
         typeof tarea.fecha !== "string" ||
-        !/^\d{4}-\d{2}-\d{2}$/.test(tarea.fecha)
+        !REGEX_FECHA.test(tarea.fecha)
     ) {
         console.warn("La fecha debe tener formato AAAA-MM-DD:", tarea.fecha);
         return false;
@@ -126,22 +126,40 @@ function listar() {
 
 // ====================================================
 // 5. BUSCAR POR TEXTO (NOMBRE O RESPONSABLE)
+//    Funciona como el filtro de frutas: lee el input #filtro
+//    y oculta/muestra cada tarjeta con el atributo hidden.
 // ====================================================
 
-function buscarPorTexto(texto) {
+function buscarPorTexto() {
 
-    let resultado = tareas.filter(t =>
-        t.nombre.toLowerCase().includes(texto.toLowerCase()) ||
-        t.responsable.toLowerCase().includes(texto.toLowerCase())
+    const filtro = document.querySelector("#filtro");
+    const mensaje = document.querySelector("#mensaje");
+    const tarjetas = document.querySelectorAll("#contenedor .tarjeta");
+
+    const texto = filtro ? filtro.value.trim().toLowerCase() : "";
+
+    // Tareas que coinciden con el texto (nombre o responsable)
+    const coincidentes = tareas.filter(t =>
+        t.nombre.toLowerCase().includes(texto) ||
+        t.responsable.toLowerCase().includes(texto)
     );
 
-    if (resultado.length === 0) {
-        console.log(`No se encontraron tareas con "${texto}".`);
-    } else {
-        console.table(resultado);
+    const idsVisibles = new Set(coincidentes.map(t => t.id));
+
+    // Mostrar u ocultar cada tarjeta, como en el ejemplo de las frutas
+    tarjetas.forEach(function (tarjeta) {
+        tarjeta.hidden = !idsVisibles.has(Number(tarjeta.dataset.id));
+    });
+
+    // El mensaje se muestra solo si hay tareas y ninguna coincide
+    if (mensaje) {
+        mensaje.hidden = coincidentes.length !== 0 || tareas.length === 0;
     }
 
-    return resultado;
+    // Las estadísticas se calculan solo con las tareas visibles
+    pintarEstadisticas(estadisticas(coincidentes));
+
+    return coincidentes;
 }
 
 
@@ -183,13 +201,13 @@ function estadisticas(lista) {
             "Error: se esperaba un array de tareas, pero se recibió:",
             lista
         );
-        return;
+        return null;
     }
 
     // Comprobar si está vacío
     if (lista.length === 0) {
         console.warn("No hay datos");
-        return;
+        return null;
     }
 
     let pendientes = 0;
@@ -243,6 +261,40 @@ function estadisticas(lista) {
     } else {
         console.log("No hay tareas con una fecha válida");
     }
+
+    // Devolvemos los resultados para poder usarlos fuera de la función
+    return {
+        total: lista.length,
+        pendientes: pendientes,
+        prioridadAlta: prioridadAlta,
+        porcentajeAlta: porcentajeAlta,
+        masProxima: masProxima
+    };
+}
+
+
+// Muestra en la página el objeto que devuelve estadisticas()
+function pintarEstadisticas(datos) {
+
+    const caja = document.querySelector("#estadisticas");
+
+    if (!caja) {
+        return;
+    }
+
+    if (!datos) {
+        caja.textContent = "No hay datos para calcular estadísticas.";
+        return;
+    }
+
+    const proxima = datos.masProxima
+        ? `${datos.masProxima.nombre} (${fechaLegible(datos.masProxima.fecha)})`
+        : "ninguna";
+
+    caja.textContent =
+        `Total: ${datos.total} | Pendientes: ${datos.pendientes} | ` +
+        `Prioridad alta: ${datos.prioridadAlta} (${datos.porcentajeAlta.toFixed(1)}%) | ` +
+        `Fecha más próxima: ${proxima}`;
 }
 
 
@@ -265,7 +317,7 @@ anadirTarea({
     nombre: "aplicacion html",
     categoria: "html",
     fecha: "2026-11-07",
-    prioridad: "urgente",
+    prioridad: "alta",
     estado: "pendiente",
     responsable: "Angel"
 });
@@ -275,7 +327,7 @@ anadirTarea({
     nombre: "aplicacion php",
     categoria: "php",
     fecha: "2026-12-07",
-    prioridad: "urgente",
+    prioridad: "alta",
     estado: "pendiente",
     responsable: "Angel"
 });
@@ -368,6 +420,9 @@ function crearTarjeta(tarea) {
 
     tarjeta.classList.add("tarjeta", "tarjeta-" + claseCategoria);
 
+    // Id usado por el buscador para saber a qué tarea corresponde la tarjeta
+    tarjeta.dataset.id = tarea.id;
+
     const titulo = document.createElement("h3");
     titulo.textContent = tarea.nombre.trim();
 
@@ -440,6 +495,9 @@ function pintar(coleccion) {
         `javascript: ${contadorCategoria.javascript}, php: ${contadorCategoria.php}).`;
 
     console.log("Tarjetas pintadas:", coleccion.length);
+
+    // Mantener el filtro activo tras repintar
+    buscarPorTexto();
 }
 
 
@@ -639,6 +697,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // -----------------------------------------------
+    // BUSCADOR
+    // -----------------------------------------------
+
+    document.querySelector("#filtro")
+        ?.addEventListener("input", buscarPorTexto);
+
+
+    // -----------------------------------------------
     // FORMULARIO
     // -----------------------------------------------
 
@@ -662,8 +728,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // -----------------------------------------------
 
     listar();
-
-    buscarPorTexto("Luis");
 
 
     // -----------------------------------------------
