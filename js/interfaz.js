@@ -1,9 +1,9 @@
 // js/interfaz.js
-import { tareas } from "./datos.js";
-import { 
-    contadorCategoria, DIAS_RECIENTE, REGEX_REFERENCIA,
-    crearFecha, fechaLegible, diasDesde, anadirTarea, 
-    buscarPorTexto, ordenar, estadisticas, siguienteId 
+import { Tarea } from "./tarea.js";
+import {
+    tareas, contadorCategoria, DIAS_RECIENTE, REGEX_REFERENCIA,
+    fechaLegible, diasDesde, anadirTarea,
+    buscarPorTexto, ordenar, estadisticas, siguienteId
 } from "./logica.js";
 
 let criterio = "nombre";
@@ -30,9 +30,9 @@ function crearTarjeta(tarea) {
     const titulo = document.createElement("h3");
     titulo.textContent = tarea.nombre.trim();
 
+    // El texto lo genera la clase
     const detalle = document.createElement("p");
-    const prefijoRef = tarea.referencia ? `Ref: ${tarea.referencia} | ` : "";
-    detalle.textContent = `${prefijoRef}Responsable: ${tarea.responsable} | Prioridad: ${tarea.prioridad} | Estado: ${tarea.estado}`;
+    detalle.textContent = tarea.descripcion();
 
     const fecha = document.createElement("p");
     fecha.classList.add("fecha");
@@ -55,19 +55,19 @@ function pintar(coleccion) {
     coleccion.forEach(tarea => contenedor.appendChild(crearTarjeta(tarea)));
 
     resumen.textContent = `Hay ${coleccion.length} tareas (html: ${contadorCategoria.html}, javascript: ${contadorCategoria.javascript}, php: ${contadorCategoria.php}).`;
-    
+
     // Mantener filtro
     const filtro = document.querySelector("#filtro");
     const mensaje = document.querySelector("#mensaje");
     const tarjetas = document.querySelectorAll("#contenedor .tarjeta");
     const texto = filtro ? filtro.value.trim() : "";
-    
+
     const coincidentes = buscarPorTexto(texto);
     const idsVisibles = new Set(coincidentes.map(t => t.id));
 
     tarjetas.forEach(t => t.hidden = !idsVisibles.has(Number(t.dataset.id)));
     if (mensaje) mensaje.hidden = coincidentes.length !== 0 || tareas.length === 0;
-    
+
     pintarEstadisticas(estadisticas(coincidentes));
 }
 
@@ -127,13 +127,22 @@ function manejarFormulario(evento) {
         return;
     }
 
-    const nueva = {
-        id: siguienteId(),
-        referencia, nombre,
-        categoria: form.elements.categoria.value,
-        fecha, prioridad: form.elements.prioridad.value,
-        estado: form.elements.estado.value, responsable
-    };
+    // Se crea la instancia; si el setter lanza un error, se muestra como aviso
+    let nueva;
+    try {
+        nueva = new Tarea({
+            id: siguienteId(),
+            referencia, nombre,
+            categoria: form.elements.categoria.value,
+            fecha,
+            prioridad: form.elements.prioridad.value,
+            estado: form.elements.estado.value,
+            responsable
+        });
+    } catch (error) {
+        mostrarAviso(error.message, "error");
+        return;
+    }
 
     if (!anadirTarea(nueva)) {
         mostrarAviso("No se pudo añadir la tarea.", "error");
@@ -151,10 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#ordenNombre")?.addEventListener("click", () => elegirOrden("nombre"));
     document.querySelector("#ordenTiempo")?.addEventListener("click", () => elegirOrden("tiempo"));
     document.querySelector("#ordenFecha")?.addEventListener("click", () => elegirOrden("fecha"));
-    
+
     // Listener del buscador
     document.querySelector("#filtro")?.addEventListener("input", actualizar);
-    
+
     // Listener del formulario
     document.querySelector("#formTarea")?.addEventListener("submit", manejarFormulario);
 

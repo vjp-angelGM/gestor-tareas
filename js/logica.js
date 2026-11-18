@@ -1,4 +1,7 @@
 // js/logica.js
+import { DatosTareas } from "./datos.js";
+import { Tarea } from "./tarea.js";
+
 export const DIAS_RECIENTE = 30;
 export const REGEX_REFERENCIA = /^[A-Z]{3}-\d{3}$/;
 export const REGEX_FECHA = /^\d{4}-\d{2}-\d{2}$/;
@@ -9,9 +12,13 @@ export const contadorCategoria = {
     php: 0
 };
 
-// Actualizar contadores cuando se añaden los datos iniciales
-// (Lo hacemos importando el array para que empiece contando bien)
-import { tareas } from "./datos.js";
+// La colección ahora está hecha de instancias de Tarea
+export const tareas = [];
+for (const datos of DatosTareas) {
+    tareas.push(new Tarea(datos));
+}
+
+// Contadores iniciales
 tareas.forEach(t => {
     if (Object.hasOwn(contadorCategoria, t.categoria)) {
         contadorCategoria[t.categoria]++;
@@ -63,10 +70,10 @@ export function anadirTarea(tarea) {
 }
 
 export function eliminarPorId(id) {
-    let indice = tareas.findIndex(t => t.id === id);
+    const indice = tareas.findIndex(t => t.id === id);
     if (indice === -1) return false;
 
-    let eliminada = tareas.splice(indice, 1)[0];
+    const eliminada = tareas.splice(indice, 1)[0];
     if (Object.hasOwn(contadorCategoria, eliminada.categoria)) {
         contadorCategoria[eliminada.categoria]--;
     }
@@ -76,8 +83,8 @@ export function eliminarPorId(id) {
 // --- BÚSQUEDA Y ORDENACIÓN ---
 export function buscarPorTexto(texto) {
     const t = texto.trim().toLowerCase();
-    return tareas.filter(tarea => 
-        tarea.nombre.toLowerCase().includes(t) || 
+    return tareas.filter(tarea =>
+        tarea.nombre.toLowerCase().includes(t) ||
         tarea.responsable.toLowerCase().includes(t)
     );
 }

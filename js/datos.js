@@ -1,5 +1,5 @@
 // js/datos.js
-export const tareas = [
+export const DatosTareas = [
     { id: 1, nombre: "aplicacion javascript", categoria: "javascript", fecha: "2025-10-07", prioridad: "urgente", estado: "pendiente", responsable: "Angel" },
     { id: 2, nombre: "aplicacion html", categoria: "html", fecha: "2026-11-07", prioridad: "alta", estado: "pendiente", responsable: "Angel" },
     { id: 3, nombre: "aplicacion php", categoria: "php", fecha: "2026-12-07", prioridad: "alta", estado: "pendiente", responsable: "Angel" },
