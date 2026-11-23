@@ -9,8 +9,9 @@ export class Tarea {
         this.prioridad = datos.prioridad;
         this.estado = datos.estado;
         this.responsable = datos.responsable;
-    }
+        }
 
+   
     // --- id (campo numérico): getter + setter con validación ---
     get id() {
         return this._id;
