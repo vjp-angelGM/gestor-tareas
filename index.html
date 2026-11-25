@@ -13,6 +13,21 @@
         .tarjeta[hidden] {
             display: none;
         }
+
+        /* Panel de estadísticas */
+        .panel-estadisticas dl {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.75rem;
+        }
+        .panel-estadisticas dt {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        .panel-estadisticas dd {
+            margin: 0;
+            font-weight: bold;
+        }
     </style>
 
     <script type="module" src="js/interfaz.js"></script>
@@ -57,6 +72,11 @@
         <label>
             Fecha
             <input type="date" id="fecha" name="fecha">
+        </label>
+
+        <label>
+            Tiempo estimado (horas)
+            <input type="number" id="tiempo" name="tiempo" min="0" step="0.5" placeholder="Ej: 2">
         </label>
 
         <label>
@@ -122,9 +142,36 @@
     <!-- MENSAJE CUANDO NO HAY RESULTADOS -->
     <p id="mensaje" hidden>No se encontraron tareas.</p>
 
-    <!-- RESUMEN Y ESTADÍSTICAS -->
-    <p id="resumen"></p>
-    <p id="estadisticas"></p>
+    <!-- RESUMEN -->
+    <!-- <p id="resumen"></p>
+
+    <!-- PANEL DE ESTADÍSTICAS (se rellena desde interfaz.js con pintarEstadisticas) -->
+    <section id="estadisticas" class="panel-estadisticas" aria-live="polite">
+        <h2>Estadísticas</h2>
+
+        <dl>
+            <div>
+                <dt>Total de tareas</dt>
+                <dd id="estTotal">0</dd>
+            </div>
+            <div>
+                <dt>Terminadas</dt>
+                <dd id="estTerminadas">0 (0%)</dd>
+            </div>
+            <div>
+                <dt>Pendientes</dt>
+                <dd id="estPendientes">0</dd>
+            </div>
+            <div>
+                <dt>Por prioridad</dt>
+                <dd id="estPrioridad">-</dd>
+            </div>
+            <div>
+                <dt>Por categoría</dt>
+                <dd id="estCategoria">-</dd>
+            </div>
+        </dl>
+    </section>
 
     <!-- TARJETAS -->
     <div id="contenedor"></div>

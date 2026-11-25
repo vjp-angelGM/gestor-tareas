@@ -3,42 +3,69 @@ import { Tarea } from "./tarea.js";
 import { buscarPorTexto, anadir } from "./logica.js";
 
 export class GestorTareas {
-    constructor(tareas) {
-        this._tareas = tareas;
-    }
+  constructor(tareas) {
+    this._tareas = tareas;
+  }
 
-    // B2: crea una instancia de Tarea por cada objeto y devuelve un gestor nuevo
-    static desdeDatos(datos) {
-        const tareas = [];
-        for (const d of datos) {
-            tareas.push(new Tarea(d));
-        }
-        return new GestorTareas(tareas);
+  // B2: crea una instancia de Tarea por cada objeto y devuelve un gestor nuevo
+  static desdeDatos(datos) {
+    const tareas = [];
+    for (const d of datos) {
+      tareas.push(new Tarea(d));
     }
+    return new GestorTareas(tareas);
+  }
 
-    get total() {
-        return this._tareas.length;
-    }
+  get total() {
+    return this._tareas.length;
+  }
 
-    // Devuelve una copia: quien la reciba no puede modificar la lista interna
-    listar() {
-        return [...this._tareas];
-    }
+  // Devuelve una copia: quien la reciba no puede modificar la lista interna
+  listar() {
+    return [...this._tareas];
+  }
 
-    // Devuelve el id asignado, o null si la tarea no es válida
-    anadir(tarea) {
-        return anadir(this._tareas, tarea);
-    }
+  // Devuelve el id asignado, o null si la tarea no es válida
+  anadir(tarea) {
+    return anadir(this._tareas, tarea);
+  }
 
-    // true si la elimina; false si el id no existe
-    eliminar(id) {
-        const indice = this._tareas.findIndex(t => t.id === id);
-        if (indice === -1) return false;
-        this._tareas.splice(indice, 1);
-        return true;
-    }
+  // true si la elimina; false si el id no existe
+  eliminar(id) {
+    const indice = this._tareas.findIndex((t) => t.id === id);
+    if (indice === -1) return false;
+    this._tareas.splice(indice, 1);
+    return true;
+  }
 
-    buscar(texto) {
-        return buscarPorTexto(this._tareas, texto);
-    }
+  buscar(texto) {
+    return buscarPorTexto(this._tareas, texto);
+  }
+
+  estadisticas() {
+    const total = this._tareas.length;
+    const completadas = this._tareas.filter((t) => t.completadas).length;
+    const pendientes = total - completadas;
+    const porcentaje =
+      total === 0 ? 0 : Math.round((completadas / total) * 100);
+    const porPrioridad = this._tareas.reduce((acc, t) => {
+      acc[t.prioridad] = (acc[t.prioridad] || 0) + 1;
+      return acc;
+    }, {});
+    const longitudMedia =
+      total === 0
+        ? 0
+        : this._tareas
+            .map((t) => t.texto.length)
+            .reduce((suma, n) => suma + n, 0) / total;
+
+    return {
+      total,
+      completadas,
+      pendientes,
+      porcentaje,
+      porPrioridad,
+      longitudMedia: Math.round(longitudMedia),
+    };
+  }
 }

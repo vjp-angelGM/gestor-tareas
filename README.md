@@ -17,4 +17,5 @@ Aplicación de gestión de tareas desarrollada en JavaScript. Permite registrar,
 - Creación de los archivos `datos.js`, `logica.js`, `interfaz.js` y mover cada parte del script a cada uno de los ficheros.
 - Creación de archivos nuevos `tarea.js` que hará la función de entidad como clase .
 - Añadido de getter y setter
-
+- Aplicar herencia y creación de nuevo fichero llamado gestor_tareas.js en el que se aplica 
+- Añadido de la función estadísticas 

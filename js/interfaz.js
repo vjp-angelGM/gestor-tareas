@@ -8,17 +8,46 @@ import {
 
 let criterio = "nombre";
 
-// --- PINTAR EN PANTALLA ---
-function pintarEstadisticas(datos) {
-    const caja = document.querySelector("#estadisticas");
-    if (!caja) return;
+// --- UTILIDADES DEL PANEL ---
+function escribir(selector, texto) {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = texto;
+}
 
-    if (!datos) {
-        caja.textContent = "No hay datos para calcular estadísticas.";
-        return;
-    }
-    const proxima = datos.masProxima ? `${datos.masProxima.nombre} (${fechaLegible(datos.masProxima.fecha)})` : "ninguna";
-    caja.textContent = `Total: ${datos.total} | Pendientes: ${datos.pendientes} | Prioridad alta: ${datos.prioridadAlta} (${datos.porcentajeAlta.toFixed(1)}%) | Fecha más próxima: ${proxima}`;
+// reduce: { alta: 2, media: 1 } -> "alta: 2, media: 1"
+function contarPor(coleccion, campo) {
+    return coleccion.reduce((acc, t) => {
+        acc[t[campo]] = (acc[t[campo]] || 0) + 1;
+        return acc;
+    }, {});
+}
+
+function formatearRecuento(recuento) {
+    return Object.entries(recuento)
+        .map(([clave, n]) => `${clave}: ${n}`)
+        .join(", ") || "-";
+}
+
+// --- PINTAR EN PANTALLA ---
+function pintarEstadisticas(coleccion) {
+    const datos = estadisticas(coleccion); // de logica.js (puede ser null si no hay tareas)
+
+    const total = datos ? datos.total : 0;
+    const pendientes = datos ? datos.pendientes : 0;
+    const terminadas = coleccion.filter(t => t.estado === "terminada").length;
+    const porcentaje = total === 0 ? 0 : Math.round((terminadas / total) * 100);
+
+    escribir("#estTotal", total);
+    escribir("#estTerminadas", `${terminadas} (${porcentaje}%)`);
+    escribir("#estPendientes", pendientes);
+    escribir("#estPrioridad", formatearRecuento(contarPor(coleccion, "prioridad")));
+    escribir("#estCategoria", formatearRecuento(contarPor(coleccion, "categoria")));
+
+    // Opcional: solo se muestra si añades <dd id="estProxima"> en el panel
+    const proxima = datos && datos.masProxima
+        ? `${datos.masProxima.nombre} (${fechaLegible(datos.masProxima.fecha)})`
+        : "ninguna";
+    escribir("#estProxima", proxima);
 }
 
 function crearTarjeta(tarea) {
@@ -46,29 +75,31 @@ function crearTarjeta(tarea) {
     return tarjeta;
 }
 
+// Pinta exactamente la colección que recibe (ya filtrada y ordenada)
 function pintar(coleccion) {
     const contenedor = document.querySelector("#contenedor");
     const resumen = document.querySelector("#resumen");
-    if (!contenedor || !resumen) return;
-
-    contenedor.replaceChildren();
-    coleccion.forEach(tarea => contenedor.appendChild(crearTarjeta(tarea)));
-
-    resumen.textContent = `Hay ${coleccion.length} tareas (html: ${contadorCategoria.html}, javascript: ${contadorCategoria.javascript}, php: ${contadorCategoria.php}).`;
-
-    // Mantener filtro
-    const filtro = document.querySelector("#filtro");
     const mensaje = document.querySelector("#mensaje");
-    const tarjetas = document.querySelectorAll("#contenedor .tarjeta");
-    const texto = filtro ? filtro.value.trim() : "";
+    if (!contenedor) return;
 
-    const coincidentes = buscarPorTexto(texto);
-    const idsVisibles = new Set(coincidentes.map(t => t.id));
+    contenedor.replaceChildren(...coleccion.map(crearTarjeta));
 
-    tarjetas.forEach(t => t.hidden = !idsVisibles.has(Number(t.dataset.id)));
-    if (mensaje) mensaje.hidden = coincidentes.length !== 0 || tareas.length === 0;
+    if (resumen) {
+        resumen.textContent = `Hay ${coleccion.length} tareas (html: ${contadorCategoria.html}, javascript: ${contadorCategoria.javascript}, php: ${contadorCategoria.php}).`;
+    }
 
-    pintarEstadisticas(estadisticas(coincidentes));
+    if (mensaje) mensaje.hidden = coleccion.length !== 0 || tareas.length === 0;
+}
+
+// --- FILTRADO ---
+function obtenerVisibles() {
+    const texto = document.querySelector("#filtro")?.value.trim() ?? "";
+    const prioridad = document.querySelector("#filtroPrioridad")?.value ?? "";
+    const estado = document.querySelector("#filtroEstado")?.value ?? "";
+
+    return buscarPorTexto(texto)
+        .filter(t => !prioridad || t.prioridad === prioridad)
+        .filter(t => !estado || t.estado === estado);
 }
 
 // --- COOKIES ---
@@ -88,7 +119,9 @@ function leerCookie(nombre) {
 
 // --- ACTUALIZAR ---
 function actualizar() {
-    pintar(ordenar(tareas, criterio));
+    const visibles = obtenerVisibles();
+    pintar(ordenar(visibles, criterio));
+    pintarEstadisticas(visibles);
 }
 
 function elegirOrden(nuevo) {
@@ -113,6 +146,7 @@ function manejarFormulario(evento) {
     const nombre = form.elements.nombre.value.trim();
     const responsable = form.elements.responsable.value.trim();
     const fecha = form.elements.fecha.value;
+    const tiempo = form.elements.tiempo?.value;
 
     if (!REGEX_REFERENCIA.test(referencia)) {
         mostrarAviso("La referencia no es válida. Formato: TAR-001.", "error");
@@ -137,7 +171,9 @@ function manejarFormulario(evento) {
             fecha,
             prioridad: form.elements.prioridad.value,
             estado: form.elements.estado.value,
-            responsable
+            responsable,
+            // El tiempo solo se envía si se ha rellenado
+            ...(tiempo ? { tiempo: Number(tiempo) } : {})
         });
     } catch (error) {
         mostrarAviso(error.message, "error");
@@ -156,21 +192,23 @@ function manejarFormulario(evento) {
 
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
-    // Listeners de botones
+    // Botones de ordenación
     document.querySelector("#ordenNombre")?.addEventListener("click", () => elegirOrden("nombre"));
     document.querySelector("#ordenTiempo")?.addEventListener("click", () => elegirOrden("tiempo"));
     document.querySelector("#ordenFecha")?.addEventListener("click", () => elegirOrden("fecha"));
 
-    // Listener del buscador
+    // Buscador y filtros
     document.querySelector("#filtro")?.addEventListener("input", actualizar);
+    document.querySelector("#filtroPrioridad")?.addEventListener("change", actualizar);
+    document.querySelector("#filtroEstado")?.addEventListener("change", actualizar);
 
-    // Listener del formulario
+    // Formulario
     document.querySelector("#formTarea")?.addEventListener("submit", manejarFormulario);
 
     // Recuperar cookie
     const ordenGuardado = leerCookie("orden");
     criterio = ["nombre", "tiempo", "fecha"].includes(ordenGuardado) ? ordenGuardado : "nombre";
 
-    // Primera carga
+    // Primera carga: pinta las tarjetas y las estadísticas
     actualizar();
 });
